@@ -1,27 +1,41 @@
 #Getting the os image from dockerhub
 FROM debian:buster
 
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get -y install wget 
-RUN apt-get -y install nginx
-RUN apt-get -y install mariadb-server
-RUN apt-get -y install php7.3 php-mysql php-fpm php-pdo php-gd php-cli php-mbstring
+#Getting all dependencies we need to build our image
+RUN apt-get update && apt-get install -y \
+	wget \
+	nginx \
+	openssl \
+	mariadb-server \
+	php7.3 php-mysql php-fpm php-pdo php-gd php-cli php-mbstring
 
-COPY ./srcs/nginx.conf ./etc/nginx/sites-available
+#replacing nginx configuration file by my configuration
+COPY ./srcs/default ./etc/nginx/sites-available
+COPY ./srcs/init.sh ./
+
+#assigning a working directory
 WORKDIR /var/www/html/
 
-RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.1/phpMyAdmin-5.0.1-english.tar.gz
-RUN tar -xf phpMyAdmin-5.0.1-english.tar.gz && rm -rf phpMyAdmin-5.0.1-english.tar.gz
-RUN mv phpMyAdmin-5.0.1-english phpmyadmin
-COPY ./srcs/config.inc.php phpmyadmin
+#getting phpmyadmin from url into my working directory.
+#then decompress ans remove tar files. 
+#finally, move the directory into a clean phpmyadmin directory.
+RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.1/phpMyAdmin-5.0.1-english.tar.gz && \
+	tar -xf phpMyAdmin-5.0.1-english.tar.gz && \
+	rm -rf phpMyAdmin-5.0.1-english.tar.gz && \
+	mv phpMyAdmin-5.0.1-english phpmyadmin
 
-RUN wget https://wordpress.org/latest.tar.gz
-RUN tar -xvzf latest.tar.gz && rm -rf latest.tar.gz
-COPY ./srcs/wp-config.php /var/www/html
+#same with wordpress download, decompress and remove tar files.
+RUN wget https://wordpress.org/latest.tar.gz && \
+	tar -xvzf latest.tar.gz && \
+	rm -rf latest.tar.gz
 
+#Uploading my configuration files for phpmyadmin and wordpress
+COPY ./srcs/config.inc.php phpmyadmin 
+COPY ./srcs/wp-config.php /var/www/html/wordpress
+
+#ssl 
 RUN openssl req -x509 -nodes -days 365 -subj "/C=FR/ST=Paris/L=Paris/O=ddecourt/OU=42 school/CN=localhost" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
 
-RUN chown -R www-data:www-data *
-RUN chmod -R 755 /var/www/*
-COPY ./srcs/init.sh ./
-CMD bash init.sh
+EXPOSE 80 443
+
+CMD bash ../../../init.sh
