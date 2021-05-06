@@ -1,3 +1,4 @@
+#Getting the os image from dockerhub
 FROM debian:buster
 
 RUN apt-get update && apt-get upgrade -y
