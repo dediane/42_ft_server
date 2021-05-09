@@ -31,8 +31,9 @@ RUN wget https://wordpress.org/latest.tar.gz && \
 	rm -rf latest.tar.gz
 
 #Uploading my configuration files for phpmyadmin and wordpress
-COPY ./srcs/config.inc.php phpmyadmin 
+COPY ./srcs/config.inc.php /var/www/html/phpmyadmin 
 COPY ./srcs/wp-config.php /var/www/html/wordpress
+COPY ./srcs/phpinfo.php /var/www/html/
 
 #ssl 
 RUN openssl req -x509 -nodes -days 365 -subj "/C=FR/ST=Paris/L=Paris/O=ddecourt/OU=42 school/CN=localhost" -newkey rsa:2048 -keyout /etc/ssl/nginx-selfsigned.key -out /etc/ssl/nginx-selfsigned.crt;
