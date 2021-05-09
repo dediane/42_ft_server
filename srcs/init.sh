@@ -8,6 +8,10 @@ echo "GRANT ALL PRIVILEGES ON wordpress.* TO 'root'@'localhost' WITH GRANT OPTIO
 echo "FLUSH PRIVILEGES;"| mysql -u root --skip-password
 echo "update mysql.user set plugin='' where user='root';"| mysql -u root --skip-password
 
-service nginx restart
+if [ "$AUTOINDEX" = "on" ];
+then ../../../autoindex_on.sh;
+else ../../../autoindex_off.sh;
+fi;
 
-bash
+service nginx restart
+bash 
