@@ -13,5 +13,5 @@ then ../../../autoindex_on.sh;
 else ../../../autoindex_off.sh;
 fi;
 
-service nginx restart
-bash 
+sleep infinity
+#bash 
