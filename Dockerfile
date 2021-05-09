@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
 
 #replacing nginx configuration file by my configuration
 COPY ./srcs/default ./etc/nginx/sites-available
-COPY ./srcs/init.sh ./
+COPY ./srcs/*.sh ./
+RUN chmod 744 *.sh
 
 #assigning a working directory
 WORKDIR /var/www/html/
